@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: consumer
+  name: consumer
+  namespace: default
+spec:
+  replicas: 8
+  selector:
+    matchLabels:
+      app: consumer
+  template:
+    metadata:
+      labels:
+        app: consumer
+      name: consumer
+    spec:
+      containers:
+      - name: consumer
+        image: pelasne.azurecr.io/consumer:1.3.1
+        env:
+        - name: EVENTHUB_CONNSTRING
+          value: "Endpoint=sb://pelasne.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=/N...4="
+        - name: EVENTHUB_NAME
+          value: "ingest"
+        - name: EVENTHUB_RATELIMIT
+          value: "1000"
+        - name: BLOB_CONNSTRING
+          value: "DefaultEndpointsProtocol=https;AccountName=pelasnecheckpoint;AccountKey=m...A==;EndpointSuffix=core.windows.net"
+        - name: BLOB_CONTAINER
+          value: "checkpoints"
+        - name: COSMOS_CONNSTRING
+          value: "AccountEndpoint=https://pelasne-cosmos.documents.azure.com:443/;AccountKey=t...==;"
+        - name: COSMOS_DATABASE
+          value: "db"
+        - name: COSMOS_CONTAINER
+          value: "container"
+        - name: COSMOS_WRITE
+          value: "yes"

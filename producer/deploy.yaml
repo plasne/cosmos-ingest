@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: producer
+  name: producer
+  namespace: default
+spec:
+  replicas: 8
+  selector:
+    matchLabels:
+      app: producer
+  template:
+    metadata:
+      labels:
+        app: producer
+      name: producer
+    spec:
+      containers:
+      - name: producer
+        image: pelasne.azurecr.io/producer:1.3.1
+        env:
+        - name: EVENTHUB_CONNSTRING
+          value: "Endpoint=sb://pelasne.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=/N...j4="
+        - name: EVENTHUB_NAME
+          value: "ingest"
+        - name: EVENTHUB_BATCHSIZE
+          value: "100"
+        - name: EVENTHUB_COUNT
+          value: "5250"
