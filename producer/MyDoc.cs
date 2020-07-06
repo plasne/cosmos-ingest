@@ -42,7 +42,7 @@ namespace producer
 
             // randomize the data
             var locId = random.Next(1, 700);
-            var partition = random.Next(0, 100);
+            var partition = random.Next(1, 100);
             var year = random.Next(2000, 2020);
             var month = random.Next(1, 12);
             var day = random.Next(1, 28);
