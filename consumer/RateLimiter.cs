@@ -35,6 +35,7 @@ namespace consumer
 
         public Task WaitForSlot()
         {
+            if (operationsPerSecond < 1) return Task.CompletedTask;
             return this.semaphore.WaitAsync();
         }
 

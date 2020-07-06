@@ -43,6 +43,40 @@ The solutions were hosted in Azure Kubernetes Service (AKS). The deploy.yaml fil
 525194 successes, 0 failures, 0 retries after 540.6954888 seconds, avg RU cost is 6, backlog is 0.
 ```
 
+## Environment Variables
+
+The producer has the following environment variable options...
+
+* EVENTHUB_CONNSTRING: [REQUIRED] The connection string for the Event Hub namespace.
+
+* EVENTHUB_NAME: [REQUIRED] The name of the Event Hub.
+
+* EVENTHUB_BATCHSIZE: [DEFAULT: 100] You may specify the number of messages in a batch.
+
+* EVENTHUB_COUNT: [DEFAULT: 100] You may specify the number of batches to run.
+
+The consumer has the following environment variable options...
+
+* EVENTHUB_CONNSTRING: [REQUIRED] The connection string for the Event Hub namespace.
+
+* EVENTHUB_NAME: [REQUIRED] The name of the Event Hub.
+
+* EVENTHUB_CONSUMERGROUP: [DEFAULT: $Default] You may specify the name of the consumer group for Event Hub.
+
+* EVENTHUB_RATELIMIT: [DEFAULT: 0] If you specify a number greater than 0, messages will be pulled from the Event Hub at that rate per second. For example, if you specify 1000, then 1000 messages per second will be read from Event Hub.
+
+* BLOB_CONNSTRING: [REQUIRED] The connection string for the Azure Storage Account that will hold checkpoint information.
+
+* BLOB_CONTAINER: [REQUIRED] The name of the container in the Azure Storage Account that will hold checkpoint information.
+
+* COSMOS_CONNSTRING: [REQUIRED] The connection string for the Cosmos account.
+
+* COSMOS_DATABASE: [REQUIRED] The database in Cosmos where data will be written.
+
+* COSMOS_CONTAINER:  [REQUIRED] The container in the Cosmos database where data will be written.
+
+You can optionally specify these parameters in a ".env" file in the folder where you execute the application from. The format is one variable per line with the variable name then equal sign followed by the value. This is most useful for local debugging as most production environments already have a system for managing environment variables.
+
 ## Index Policy
 
 You can reduce the RU cost of a record write significantly by specifying an index policy that only computes indexes that you intend to use. For instance, the testing was done with only the "key" and "id" (always indexed) indexed.

@@ -15,7 +15,6 @@ namespace producer
 
         static async Task Main(string[] args)
         {
-            // NOTE: partition space: 147,147
 
             // get variables
             DotEnv.Config(false);
