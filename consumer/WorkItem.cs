@@ -81,6 +81,13 @@ namespace consumer
                             return;
                         }
 
+                        // canceled (which shouldn't ever happen in this sample)
+                        if (itemResponse.IsCanceled)
+                        {
+                            this.Status = WorkItemStatus.NeedsRetry;
+                            onRetry();
+                        }
+
                         // failure
                         AggregateException innerExceptions = itemResponse.Exception.Flatten();
                         CosmosException cosmosException = innerExceptions.InnerExceptions.FirstOrDefault(innerEx => innerEx is CosmosException) as CosmosException;

@@ -18,10 +18,10 @@ spec:
     spec:
       containers:
       - name: producer
-        image: pelasne.azurecr.io/producer:1.3.1
+        image: pelasne.azurecr.io/producer:1.4.0
         env:
         - name: EVENTHUB_CONNSTRING
-          value: "Endpoint=sb://pelasne.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=/N...j4="
+          value: "Endpoint=sb://pelasne.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=/N...4="
         - name: EVENTHUB_NAME
           value: "ingest"
         - name: EVENTHUB_BATCHSIZE

@@ -3,13 +3,11 @@ using dotenv.net;
 using Azure.Storage.Blobs;
 using Azure.Messaging.EventHubs;
 using Azure.Messaging.EventHubs.Consumer;
-using Azure.Messaging.EventHubs.Processor;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using Microsoft.Azure.Cosmos;
 using System.Threading;
 using System.Collections.Generic;
-using System.Collections.Concurrent;
 using System.Linq;
 
 namespace consumer
@@ -56,9 +54,6 @@ namespace consumer
                 MaxRetryAttemptsOnRateLimitedRequests = 0
             });
             var container = client.GetContainer(cosmosDatabase, cosmosContainer);
-
-            // create a list of outstanding requests
-            var list = new ConcurrentBag<ProcessEventArgs>();
 
             // create the rate limiter
             var limiter = new RateLimiter(eventHubRateLimit);

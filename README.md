@@ -4,15 +4,29 @@
 
 The goal of this solution was to prove that 4.2 million records in Event Hubs could be dispatched to Cosmos in under 30 minutes.
 
-There are 2 projects:
+There are multiple projects:
 
 * producer - This project pushs the records into Event Hubs.
 
 * consumer - This project reads the records from Event Hubs and pushes them into Cosmos.
 
-These projects are written as dotnet console applications that use the latest versions of the SDKs for Event Hubs and Cosmos. At the time of this writing, that meant using EventProcessorClient for Event Hubs and the AllowBulkExecution flag for Cosmos. Using the EventProcessorClient requires a Storage Account for recording
+These projects are written as dotnet console applications that use the latest versions of the SDKs for Event Hubs and Cosmos. At the time of this writing, that meant using EventProcessorClient for Event Hubs and the AllowBulkExecution flag for Cosmos. Using the EventProcessorClient requires a Storage Account for checkpointing.
 
-The solutions were hosted in Azure Kubernetes Service (AKS). The deploy.yaml files in each project include a deployment for 8 containers of each.
+The solutions were hosted in Azure Kubernetes Service (AKS). The deploy.yaml files in each project include a deployment for 1 Pod with 8 replicas of each.
+
+* func - This project shows comparable consumers using Azure Functions.
+
+## Links
+
+* Click to see all [Performance Test Results](./performance-tests.md).
+
+* Click to learn more about the [Azure Functions](./func/README.md).
+
+* Click for guidance on [architecture](./architecture.md), such as when to use the SDK/AKS microservice approach vs. Functions and design considerations for Event Hubs and Cosmos.
+
+* Click to learn more about the [consumer service](./consumer/README.md), such as the rate-limiting technique and how a rolling checkpoint is handled.
+
+* Click to learn more about [message delivery](./message-delivery.md), for instance, how to handle at-least-once delivery semantics, and if I put in 4.2m messages do I get that same number out?
 
 ## Running a Test
 
@@ -79,7 +93,7 @@ You can optionally specify these parameters in a ".env" file in the folder where
 
 ## Index Policy
 
-You can reduce the RU cost of a record write significantly by specifying an index policy that only computes indexes that you intend to use. For instance, the testing was done with only the "key" and "id" (always indexed) indexed.
+You can reduce the RU cost of a record write significantly by specifying an index policy that only computes indexes that you intend to use. For instance, the testing was done with only the "key" and "id" (automatic) indexed.
 
 ```json
 {
@@ -154,3 +168,15 @@ In the logs, you will see an retries exceeding your successes and you will see a
 The second point of evidence can be seen in the Throughput section of the Cosmos metrics. You will see a large number of 429s and a max consumed RU/s that exceeds the maximum number of RUs per physical partition. For instance, if you have 50k RUs provisioned and 5 physical partitions, then the max consumed RUs must stay below 10k.
 
 ![failure diagram](./failure.png)
+
+## Error Handling
+
+If an exception is thrown in the consumer service, it will crash the container. Kubernetes will generally restart that container (unless there are enough crashes to go into CrashBackoff). The consumer only checkpoints after an item has been committed to Cosmos or it has identified a problem that prevents a commit of that item (ex. if it were missing the key or id property), therefore, when it restarts it will pick up where it left off.
+
+With microservices in AKS, I am a big fan of just throwing an exception and crashing and letting the hosting environment figure out how to recover. However, for a production scenario, you might need to implement more intelligent error handling for a few cases like:
+
+* messages that cannot be deserialized (deadletter).
+
+* an Event Hub outage.
+
+* a Cosmos outage.
