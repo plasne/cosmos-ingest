@@ -1,0 +1,21 @@
+{
+    "version": "2.0",
+    "functionTimeout": "00:15:00",
+    "logging": {
+        "applicationInsights": {
+            "samplingExcludedTypes": "Request",
+            "samplingSettings": {
+                "isEnabled": true
+            }
+        }
+    },
+    "extensions": {
+        "eventHubs": {
+            "batchCheckpointFrequency": 1,
+            "eventProcessorOptions": {
+                "maxBatchSize": 30000,
+                "prefetchCount": 90000
+            }
+        }
+    }
+}
