@@ -60,6 +60,8 @@ For the purposes of this section, I am using the word "microservice" to describe
 
   * To get high cardinality with even distribution, you should consider adding a random component to the partition key. The customer had originally used a location id as the key, but they only had 700 locations. I added a randomly generated number from 001-100 to the end of location id. This upgrades the key space from 700 possible values to 70,000. With a large enough number of records, this will give you a very even distribution.
 
+  * I like to have less than 100 records per logical partition. In this case, 4.2m records divided by 70k yields 60 records per partition, a reasonable number.
+
 * Particularly with Functions, which are less predictable in how much work is running in any given second, you should expect some 429s (TooManyRequests) even if you are right-sized. It could even be several thousand per minute, but they shouldn't be sustained - you should get some spikes of 429 and then have periods with no 429s.
 
 * If you are using the microservices approach with rate-limiting, you should be able to exactly calculate the RU requirement:

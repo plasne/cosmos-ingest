@@ -8,17 +8,7 @@ There are 2 Functions in this project so that I could test performance both ways
 
 * bulk: This uses the Cosmos 3.x+ SDK AllowBulkExecution flag.
 
-## IAsyncCollector
-
-Cancellations
-
-##
-
-S1
-8 instances
-50k RU
-15k prefetch
-5k batch
+:information_source: You should use the bulk implementation, it is MUCH faster and does not have an issue with records delivered more than once.
 
 ## Unpredictable Batch Size
 
@@ -31,3 +21,13 @@ Even though the Event Hub partitions were full of the 4.2m messages (16 partitio
 ## Execution Speed
 
 I looked at a lot of Function executions. If I divide the number of records processed by the execution time, I found the best performing execution processed about 100/sec and more commonly ~50/sec. Moreover, this is only consuming about 6.2k RU per physical partition or ~31k RU total. Therefore, I expect this execution to take about 2.5 hours.
+
+## Cancellations
+
+Through testing, I determined that about 4% of Azure Function executions on an App Service Standard SKU were canceled by the Function runtime. No reason code is available, so I cannot say for sure what the issue is, but I assume it is a particular threshold that is being tripped (too much CPU utilization, too much memory utilization, too many faults of some kind, etc.).
+
+The Premium SKU is not immune to these cancellations, but I only saw 1 cancellation out of dozens of runs, no where near 4%.
+
+## At-Least-Once
+
+Event Hubs delivers messages at-least-once, which means that you may see a record more than once. This could cause errors with the consumer implementation because it attempts to INSERT a record rather than UPSERT.
